@@ -37,6 +37,7 @@ resource "aws_s3_bucket_server_side_encryption_configuration" "aft_logging_bucke
   }
 }
 
+/*
 resource "aws_s3_bucket_lifecycle_configuration" "aft_logging_bucket_lifecycle_configuration" {
   provider = aws.log_archive
   bucket   = aws_s3_bucket.aft_logging_bucket.id
@@ -49,6 +50,26 @@ resource "aws_s3_bucket_lifecycle_configuration" "aft_logging_bucket_lifecycle_c
     }
   }
 
+}
+*/
+
+resource "aws_s3_bucket_lifecycle_configuration" "aft_logging_bucket_lifecycle_configuration" {
+  provider = aws.log_archive
+  bucket   = aws_s3_bucket.aft_logging_bucket.id
+
+  rule {
+    id     = "aft_logging_bucket_lifecycle_configuration_rule"
+    status = "Enabled"
+
+    # required: exactly one of filter or prefix
+    filter {
+      prefix = ""
+    }
+
+    noncurrent_version_expiration {
+      noncurrent_days = var.log_archive_bucket_object_expiration_days
+    }
+  }
 }
 
 resource "aws_s3_bucket_policy" "aft_logging_bucket" {
